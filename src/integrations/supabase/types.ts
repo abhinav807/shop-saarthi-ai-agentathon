@@ -14,7 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ai_reports: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          report_type: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          id?: string
+          report_type: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          report_type?: string
+        }
+        Relationships: []
+      }
+      inventory: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          minimum_stock: number
+          name: string
+          quantity: number
+          unit: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          minimum_stock?: number
+          name: string
+          quantity?: number
+          unit?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          minimum_stock?: number
+          name?: string
+          quantity?: number
+          unit?: string
+        }
+        Relationships: []
+      }
+      sales: {
+        Row: {
+          cost_price: number
+          id: string
+          product: string
+          quantity_sold: number
+          sale_date: string
+          selling_price: number
+        }
+        Insert: {
+          cost_price?: number
+          id?: string
+          product: string
+          quantity_sold?: number
+          sale_date?: string
+          selling_price?: number
+        }
+        Update: {
+          cost_price?: number
+          id?: string
+          product?: string
+          quantity_sold?: number
+          sale_date?: string
+          selling_price?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
