@@ -15,7 +15,17 @@ import {
 } from "@/lib/business";
 import { seedDemoData } from "@/lib/seed";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, ArrowUpRight, Lightbulb, Plus, Sparkles, Activity, PackageX, IndianRupee, TrendingUp } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowUpRight,
+  Lightbulb,
+  Plus,
+  Sparkles,
+  Activity,
+  PackageX,
+  IndianRupee,
+  TrendingUp,
+} from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -24,7 +34,11 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Dashboard · ShopSaarthi AI" },
-      { name: "description", content: "AI Business Manager for small Indian businesses — inventory, sales, profit, risks and opportunities at a glance." },
+      {
+        name: "description",
+        content:
+          "AI Business Manager for small Indian businesses — inventory, sales, profit, risks and opportunities at a glance.",
+      },
     ],
   }),
   component: Dashboard,
@@ -37,7 +51,10 @@ function Dashboard() {
   const inv = useQuery({
     queryKey: ["inventory"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("inventory").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("inventory")
+        .select("*")
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data as InventoryItem[];
     },
@@ -45,7 +62,10 @@ function Dashboard() {
   const sal = useQuery({
     queryKey: ["sales"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("sales").select("*").order("sale_date", { ascending: false });
+      const { data, error } = await supabase
+        .from("sales")
+        .select("*")
+        .order("sale_date", { ascending: false });
       if (error) throw error;
       return data as Sale[];
     },
@@ -53,7 +73,12 @@ function Dashboard() {
   const rep = useQuery({
     queryKey: ["latest-coach"],
     queryFn: async () => {
-      const { data } = await supabase.from("ai_reports").select("*").eq("report_type", "coach").order("created_at", { ascending: false }).limit(1);
+      const { data } = await supabase
+        .from("ai_reports")
+        .select("*")
+        .eq("report_type", "coach")
+        .order("created_at", { ascending: false })
+        .limit(1);
       return (data?.[0] as AIReport | undefined) ?? null;
     },
   });
@@ -67,9 +92,21 @@ function Dashboard() {
   const stats = computeSalesStats(sales);
   const lowStock = items.filter((i) => stockStatus(i) !== "healthy");
   const recent = [
-    ...sales.slice(0, 5).map((s) => ({ type: "sale" as const, date: s.sale_date, label: `Sold ${s.quantity_sold} × ${s.product}`, amount: Number(s.selling_price) * Number(s.quantity_sold) })),
-    ...items.slice(0, 3).map((i) => ({ type: "stock" as const, date: i.created_at, label: `Added ${i.quantity}${i.unit} ${i.name}`, amount: 0 })),
-  ].sort((a, b) => +new Date(b.date) - +new Date(a.date)).slice(0, 8);
+    ...sales.slice(0, 5).map((s) => ({
+      type: "sale" as const,
+      date: s.sale_date,
+      label: `Sold ${s.quantity_sold} × ${s.product}`,
+      amount: Number(s.selling_price) * Number(s.quantity_sold),
+    })),
+    ...items.slice(0, 3).map((i) => ({
+      type: "stock" as const,
+      date: i.created_at,
+      label: `Added ${i.quantity}${i.unit} ${i.name}`,
+      amount: 0,
+    })),
+  ]
+    .sort((a, b) => +new Date(b.date) - +new Date(a.date))
+    .slice(0, 8);
 
   const reportContent = rep.data?.content as any;
 
@@ -102,7 +139,9 @@ function Dashboard() {
             </Button>
           )}
           <Button asChild>
-            <Link to="/sales"><Plus className="size-4" /> Record sale</Link>
+            <Link to="/sales">
+              <Plus className="size-4" /> Record sale
+            </Link>
           </Button>
         </>
       }
@@ -118,7 +157,9 @@ function Dashboard() {
                 <Button onClick={handleSeed} disabled={seeding}>
                   <Sparkles className="size-4" /> Load demo data
                 </Button>
-                <Button variant="outline" asChild><Link to="/inventory">Add inventory</Link></Button>
+                <Button variant="outline" asChild>
+                  <Link to="/inventory">Add inventory</Link>
+                </Button>
               </div>
             }
           />
@@ -165,9 +206,19 @@ function Dashboard() {
           {/* AI feeds */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Panel
-              title={<span className="flex items-center gap-2"><Lightbulb className="size-4 text-info" /> AI Opportunities</span>}
+              title={
+                <span className="flex items-center gap-2">
+                  <Lightbulb className="size-4 text-info" /> AI Opportunities
+                </span>
+              }
               description="Growth signals spotted by your AI coach"
-              actions={<Button size="sm" variant="ghost" asChild><Link to="/ai-coach">Open coach <ArrowUpRight className="size-3" /></Link></Button>}
+              actions={
+                <Button size="sm" variant="ghost" asChild>
+                  <Link to="/ai-coach">
+                    Open coach <ArrowUpRight className="size-3" />
+                  </Link>
+                </Button>
+              }
             >
               {reportContent?.opportunities?.length ? (
                 <ul className="space-y-3">
@@ -182,11 +233,19 @@ function Dashboard() {
                   ))}
                 </ul>
               ) : (
-                <EmptyState icon={<Sparkles className="size-4" />} title="No AI report yet" description="Visit the AI Coach to generate growth opportunities." />
+                <EmptyState
+                  icon={<Sparkles className="size-4" />}
+                  title="No AI report yet"
+                  description="Visit the AI Coach to generate growth opportunities."
+                />
               )}
             </Panel>
             <Panel
-              title={<span className="flex items-center gap-2"><AlertTriangle className="size-4 text-danger" /> AI Risks</span>}
+              title={
+                <span className="flex items-center gap-2">
+                  <AlertTriangle className="size-4 text-danger" /> AI Risks
+                </span>
+              }
               description="Issues threatening your business"
             >
               {reportContent?.risks?.length ? (
@@ -202,16 +261,27 @@ function Dashboard() {
                   ))}
                 </ul>
               ) : (
-                <EmptyState icon={<AlertTriangle className="size-4" />} title="No risks identified yet" description="Generate an AI report to surface business risks." />
+                <EmptyState
+                  icon={<AlertTriangle className="size-4" />}
+                  title="No risks identified yet"
+                  description="Generate an AI report to surface business risks."
+                />
               )}
             </Panel>
           </div>
 
           {/* Low stock + recent activity + quick actions */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <Panel title="Low Stock" description="Items below minimum threshold" className="lg:col-span-1">
+            <Panel
+              title="Low Stock"
+              description="Items below minimum threshold"
+              className="lg:col-span-1"
+            >
               {lowStock.length === 0 ? (
-                <EmptyState title="Everything is stocked" description="No items need attention right now." />
+                <EmptyState
+                  title="Everything is stocked"
+                  description="No items need attention right now."
+                />
               ) : (
                 <ul className="divide-y -m-5">
                   {lowStock.slice(0, 6).map((i) => {
@@ -220,7 +290,9 @@ function Dashboard() {
                       <li key={i.id} className="px-5 py-3 flex items-center justify-between">
                         <div>
                           <div className="text-sm font-medium">{i.name}</div>
-                          <div className="text-xs text-muted-foreground">{Number(i.quantity)} {i.unit} · min {Number(i.minimum_stock)}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {Number(i.quantity)} {i.unit} · min {Number(i.minimum_stock)}
+                          </div>
                         </div>
                         <StatusPill tone={s === "critical" ? "danger" : "warning"}>{s}</StatusPill>
                       </li>
@@ -230,19 +302,34 @@ function Dashboard() {
               )}
             </Panel>
 
-            <Panel title="Recent Activity" description="Latest sales and inventory changes" className="lg:col-span-1">
+            <Panel
+              title="Recent Activity"
+              description="Latest sales and inventory changes"
+              className="lg:col-span-1"
+            >
               {recent.length === 0 ? (
                 <EmptyState title="No activity yet" />
               ) : (
                 <ul className="space-y-3">
                   {recent.map((r, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm">
-                      <span className={`size-1.5 rounded-full mt-2 shrink-0 ${r.type === "sale" ? "bg-success" : "bg-info"}`} />
+                      <span
+                        className={`size-1.5 rounded-full mt-2 shrink-0 ${r.type === "sale" ? "bg-success" : "bg-info"}`}
+                      />
                       <div className="flex-1 min-w-0">
                         <div className="truncate">{r.label}</div>
-                        <div className="text-xs text-muted-foreground">{new Date(r.date).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {new Date(r.date).toLocaleString("en-IN", {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          })}
+                        </div>
                       </div>
-                      {r.amount > 0 && <span className="text-xs font-medium tabular-nums">{formatINR(r.amount)}</span>}
+                      {r.amount > 0 && (
+                        <span className="text-xs font-medium tabular-nums">
+                          {formatINR(r.amount)}
+                        </span>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -253,9 +340,24 @@ function Dashboard() {
               <div className="grid grid-cols-2 gap-2">
                 <QA to="/inventory" label="Add Item" icon={<Plus className="size-4" />} />
                 <QA to="/sales" label="Record Sale" icon={<ShoppingBagIcon />} />
-                <QA to="/ai-coach" label="AI Coach" icon={<Sparkles className="size-4" />} tone="info" />
-                <QA to="/planner" label="Daily Plan" icon={<Lightbulb className="size-4" />} tone="plan" />
-                <QA to="/profit" label="Profit View" icon={<TrendingUp className="size-4" />} tone="success" />
+                <QA
+                  to="/ai-coach"
+                  label="AI Coach"
+                  icon={<Sparkles className="size-4" />}
+                  tone="info"
+                />
+                <QA
+                  to="/planner"
+                  label="Daily Plan"
+                  icon={<Lightbulb className="size-4" />}
+                  tone="plan"
+                />
+                <QA
+                  to="/profit"
+                  label="Profit View"
+                  icon={<TrendingUp className="size-4" />}
+                  tone="success"
+                />
                 <QA to="/data" label="Data Center" icon={<Activity className="size-4" />} />
               </div>
             </Panel>
@@ -270,31 +372,61 @@ function ShoppingBagIcon() {
   return <Plus className="size-4" />;
 }
 
-function QA({ to, label, icon, tone }: { to: string; label: string; icon: React.ReactNode; tone?: "info" | "success" | "plan" }) {
+function QA({
+  to,
+  label,
+  icon,
+  tone,
+}: {
+  to: string;
+  label: string;
+  icon: React.ReactNode;
+  tone?: "info" | "success" | "plan";
+}) {
   const cls =
-    tone === "info" ? "hover:bg-info-soft hover:text-info"
-    : tone === "success" ? "hover:bg-success-soft hover:text-success"
-    : tone === "plan" ? "hover:bg-plan-soft hover:text-plan"
-    : "hover:bg-accent";
+    tone === "info"
+      ? "hover:bg-info-soft hover:text-info"
+      : tone === "success"
+        ? "hover:bg-success-soft hover:text-success"
+        : tone === "plan"
+          ? "hover:bg-plan-soft hover:text-plan"
+          : "hover:bg-accent";
   return (
-    <Link to={to as any} className={`flex flex-col items-start gap-2 p-3 border rounded-md text-xs font-medium transition-colors ${cls}`}>
+    <Link
+      to={to as any}
+      className={`flex flex-col items-start gap-2 p-3 border rounded-md text-xs font-medium transition-colors ${cls}`}
+    >
       {icon}
       {label}
     </Link>
   );
 }
 
-function HealthScoreCard({ score, breakdown }: { score: number; breakdown: Record<string, number> }) {
+function HealthScoreCard({
+  score,
+  breakdown,
+}: {
+  score: number;
+  breakdown: Record<string, number>;
+}) {
   const tone = score >= 75 ? "success" : score >= 50 ? "warning" : "danger";
-  const color = tone === "success" ? "text-success" : tone === "warning" ? "text-warning-foreground" : "text-danger";
-  const ring = tone === "success" ? "stroke-success" : tone === "warning" ? "stroke-warning" : "stroke-danger";
+  const color =
+    tone === "success"
+      ? "text-success"
+      : tone === "warning"
+        ? "text-warning-foreground"
+        : "text-danger";
+  const ring =
+    tone === "success" ? "stroke-success" : tone === "warning" ? "stroke-warning" : "stroke-danger";
   const r = 60;
   const c = 2 * Math.PI * r;
   const off = c - (score / 100) * c;
   return (
     <div className="bg-card border rounded-lg p-5 h-full flex flex-col">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Business Health</span>
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          Business Health
+        </span>
         <StatusPill tone={tone}>
           {score >= 75 ? "Strong" : score >= 50 ? "Watch" : "At Risk"}
         </StatusPill>
@@ -303,7 +435,16 @@ function HealthScoreCard({ score, breakdown }: { score: number; breakdown: Recor
         <div className="relative size-36 shrink-0">
           <svg viewBox="0 0 160 160" className="size-36 -rotate-90">
             <circle cx="80" cy="80" r={r} className="stroke-muted fill-none" strokeWidth="12" />
-            <circle cx="80" cy="80" r={r} className={`fill-none ${ring} transition-all`} strokeWidth="12" strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" />
+            <circle
+              cx="80"
+              cy="80"
+              r={r}
+              className={`fill-none ${ring} transition-all`}
+              strokeWidth="12"
+              strokeDasharray={c}
+              strokeDashoffset={off}
+              strokeLinecap="round"
+            />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <div className={`text-3xl font-bold tabular-nums ${color}`}>{score}</div>
@@ -318,7 +459,10 @@ function HealthScoreCard({ score, breakdown }: { score: number; breakdown: Recor
                 <span className="tabular-nums font-medium">{v}</span>
               </div>
               <div className="h-1 bg-muted rounded-full overflow-hidden">
-                <div className={`h-full ${v >= 75 ? "bg-success" : v >= 50 ? "bg-warning" : "bg-danger"}`} style={{ width: `${v}%` }} />
+                <div
+                  className={`h-full ${v >= 75 ? "bg-success" : v >= 50 ? "bg-warning" : "bg-danger"}`}
+                  style={{ width: `${v}%` }}
+                />
               </div>
             </div>
           ))}
