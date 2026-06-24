@@ -35,6 +35,42 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_dues: {
+        Row: {
+          amount: number
+          created_at: string
+          customer_name: string
+          due_date: string | null
+          id: string
+          notes: string
+          paid_date: string | null
+          phone: string
+          status: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          customer_name: string
+          due_date?: string | null
+          id?: string
+          notes?: string
+          paid_date?: string | null
+          phone?: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          customer_name?: string
+          due_date?: string | null
+          id?: string
+          notes?: string
+          paid_date?: string | null
+          phone?: string
+          status?: string
+        }
+        Relationships: []
+      }
       inventory: {
         Row: {
           category: string
@@ -89,6 +125,36 @@ export type Database = {
           quantity_sold?: number
           sale_date?: string
           selling_price?: number
+        }
+        Relationships: []
+      }
+      shop_profile: {
+        Row: {
+          address: string
+          business_category: string
+          created_at: string
+          id: string
+          owner_name: string
+          shop_name: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string
+          business_category?: string
+          created_at?: string
+          id?: string
+          owner_name: string
+          shop_name: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          business_category?: string
+          created_at?: string
+          id?: string
+          owner_name?: string
+          shop_name?: string
+          updated_at?: string
         }
         Relationships: []
       }
