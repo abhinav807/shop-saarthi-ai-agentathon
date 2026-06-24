@@ -45,7 +45,9 @@ export function AppShell({
             </div>
             <div className="leading-tight">
               <div className="text-sm font-semibold tracking-tight">ShopSaarthi</div>
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">AI Business OS</div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                AI Business OS
+              </div>
             </div>
           </Link>
         </div>

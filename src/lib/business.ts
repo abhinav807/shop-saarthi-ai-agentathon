@@ -63,7 +63,9 @@ export function computeSalesStats(sales: Sale[]) {
 export function computeInventoryHealth(items: InventoryItem[]) {
   const total = items.length;
   if (total === 0) return { total: 0, healthy: 0, low: 0, critical: 0, score: 100 };
-  let healthy = 0, low = 0, critical = 0;
+  let healthy = 0,
+    low = 0,
+    critical = 0;
   for (const i of items) {
     const q = Number(i.quantity);
     const min = Number(i.minimum_stock);
@@ -72,7 +74,7 @@ export function computeInventoryHealth(items: InventoryItem[]) {
     else if (min > 0 && q < min * 1.5) low++;
     else healthy++;
   }
-  const score = Math.round(((healthy * 100 + low * 50 + critical * 0) / total));
+  const score = Math.round((healthy * 100 + low * 50 + critical * 0) / total);
   return { total, healthy, low, critical, score };
 }
 
@@ -87,13 +89,17 @@ export function computeHealthScore(items: InventoryItem[], sales: Sale[]) {
   const profitScore = Math.max(0, Math.min(100, (s.margin / 30) * 100));
 
   // Stock availability (15%): % of items not critical
-  const availScore = inv.total === 0 ? 50 : Math.round(((inv.total - inv.critical) / inv.total) * 100);
+  const availScore =
+    inv.total === 0 ? 50 : Math.round(((inv.total - inv.critical) / inv.total) * 100);
 
   // Product performance (20%): share of profitable products
   const profitableProducts = s.products.filter((p) => p.profit > 0).length;
-  const perfScore = s.products.length === 0 ? 50 : Math.round((profitableProducts / s.products.length) * 100);
+  const perfScore =
+    s.products.length === 0 ? 50 : Math.round((profitableProducts / s.products.length) * 100);
 
-  const total = Math.round(invScore * 0.35 + profitScore * 0.3 + availScore * 0.15 + perfScore * 0.2);
+  const total = Math.round(
+    invScore * 0.35 + profitScore * 0.3 + availScore * 0.15 + perfScore * 0.2,
+  );
   return {
     total: Math.max(0, Math.min(100, total)),
     breakdown: {
@@ -112,6 +118,49 @@ export function stockStatus(item: InventoryItem): "critical" | "low" | "healthy"
   if (q < min) return "low";
   if (min > 0 && q < min * 1.5) return "low";
   return "healthy";
+}
+
+export type ShopProfile = {
+  id: string;
+  owner_name: string;
+  shop_name: string;
+  address: string;
+  business_category: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CustomerDue = {
+  id: string;
+  customer_name: string;
+  phone: string;
+  amount: number;
+  notes: string;
+  status: string;
+  due_date: string | null;
+  paid_date: string | null;
+  created_at: string;
+};
+
+export function computeKhataStats(dues: CustomerDue[]) {
+  let totalOutstanding = 0;
+  let totalPaid = 0;
+  let pendingCount = 0;
+  let overdueCount = 0;
+  const now = new Date();
+  for (const d of dues) {
+    const amt = Number(d.amount);
+    if (d.status === "paid") {
+      totalPaid += amt;
+    } else {
+      totalOutstanding += amt;
+      pendingCount++;
+      if (d.due_date && new Date(d.due_date) < now) {
+        overdueCount++;
+      }
+    }
+  }
+  return { totalOutstanding, totalPaid, pendingCount, overdueCount };
 }
 
 export function formatINR(n: number) {

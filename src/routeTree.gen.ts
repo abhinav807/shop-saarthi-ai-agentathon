@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SalesRouteImport } from './routes/sales'
 import { Route as ProfitRouteImport } from './routes/profit'
 import { Route as PlannerRouteImport } from './routes/planner'
+import { Route as KhatabookRouteImport } from './routes/khatabook'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as DataRouteImport } from './routes/data'
 import { Route as AiCoachRouteImport } from './routes/ai-coach'
@@ -30,6 +31,11 @@ const ProfitRoute = ProfitRouteImport.update({
 const PlannerRoute = PlannerRouteImport.update({
   id: '/planner',
   path: '/planner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KhatabookRoute = KhatabookRouteImport.update({
+  id: '/khatabook',
+  path: '/khatabook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InventoryRoute = InventoryRouteImport.update({
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/ai-coach': typeof AiCoachRoute
   '/data': typeof DataRoute
   '/inventory': typeof InventoryRoute
+  '/khatabook': typeof KhatabookRoute
   '/planner': typeof PlannerRoute
   '/profit': typeof ProfitRoute
   '/sales': typeof SalesRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/ai-coach': typeof AiCoachRoute
   '/data': typeof DataRoute
   '/inventory': typeof InventoryRoute
+  '/khatabook': typeof KhatabookRoute
   '/planner': typeof PlannerRoute
   '/profit': typeof ProfitRoute
   '/sales': typeof SalesRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/ai-coach': typeof AiCoachRoute
   '/data': typeof DataRoute
   '/inventory': typeof InventoryRoute
+  '/khatabook': typeof KhatabookRoute
   '/planner': typeof PlannerRoute
   '/profit': typeof ProfitRoute
   '/sales': typeof SalesRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/ai-coach'
     | '/data'
     | '/inventory'
+    | '/khatabook'
     | '/planner'
     | '/profit'
     | '/sales'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/ai-coach'
     | '/data'
     | '/inventory'
+    | '/khatabook'
     | '/planner'
     | '/profit'
     | '/sales'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/ai-coach'
     | '/data'
     | '/inventory'
+    | '/khatabook'
     | '/planner'
     | '/profit'
     | '/sales'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   AiCoachRoute: typeof AiCoachRoute
   DataRoute: typeof DataRoute
   InventoryRoute: typeof InventoryRoute
+  KhatabookRoute: typeof KhatabookRoute
   PlannerRoute: typeof PlannerRoute
   ProfitRoute: typeof ProfitRoute
   SalesRoute: typeof SalesRoute
@@ -142,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/planner'
       fullPath: '/planner'
       preLoaderRoute: typeof PlannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/khatabook': {
+      id: '/khatabook'
+      path: '/khatabook'
+      fullPath: '/khatabook'
+      preLoaderRoute: typeof KhatabookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inventory': {
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiCoachRoute: AiCoachRoute,
   DataRoute: DataRoute,
   InventoryRoute: InventoryRoute,
+  KhatabookRoute: KhatabookRoute,
   PlannerRoute: PlannerRoute,
   ProfitRoute: ProfitRoute,
   SalesRoute: SalesRoute,
@@ -187,3 +208,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
