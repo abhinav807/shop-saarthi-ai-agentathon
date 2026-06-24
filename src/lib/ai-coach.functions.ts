@@ -21,8 +21,8 @@ const MOCK_AI_REPORT = {
 };
 
 export const generateAiCoachReport = createServerFn({ method: "POST" })
-  .validator((d: unknown) => PayloadSchema.parse(d))
-  .handler(async ({ data }) => {
+  .inputValidator((d: unknown) => PayloadSchema.parse(d))
+  .handler(async ({ data }: { data: z.infer<typeof PayloadSchema> }) => {
     const key = process.env.LOVABLE_API_KEY;
     
     // Return mock data if no API key is configured
