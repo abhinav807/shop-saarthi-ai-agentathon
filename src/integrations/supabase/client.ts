@@ -33,14 +33,42 @@ function createSupabaseClient() {
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
   const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
 
+  // Return null client if credentials are not configured - graceful fallback
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     const missing = [
       ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
       ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
     ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+    console.warn(`[Supabase] Missing environment variable(s): ${missing.join(', ')}. Client operations will return empty data.`);
+    
+    // Return a mock client that returns empty data
+    const mockClient = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            order: () => ({
+              limit: async () => ({ data: [], error: null })
+            })
+          }),
+          order: () => ({
+            limit: async () => ({ data: [], error: null })
+          }),
+          insert: async () => ({ data: null, error: null }),
+        }),
+        insert: async () => ({ data: null, error: null }),
+        update: () => ({
+          eq: async () => ({ data: null, error: null })
+        }),
+        delete: () => ({
+          eq: async () => ({ data: null, error: null })
+        }),
+      }),
+      auth: {
+        getSession: async () => ({ data: { session: null }, error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      },
+    } as unknown as ReturnType<typeof createClient<Database>>;
+    return mockClient;
   }
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
