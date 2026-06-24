@@ -8,11 +8,33 @@ const PayloadSchema = z.object({
   sales: z.array(z.any()),
 });
 
+// Safe fallback mock data when AI gateway is not configured
+const MOCK_DAILY_PLAN = {
+  headline: "Configure AI Gateway for daily planning",
+  priority: [
+    { task: "Set LOVABLE_API_KEY in environment", why: "Required for AI-powered daily planning" },
+  ],
+  inventory: [
+    { task: "Check stock levels manually", why: "AI planning not available without configuration" },
+  ],
+  sales: [
+    { task: "Review recent sales records", why: "AI planning not available without configuration" },
+  ],
+  growth: [
+    { task: "Configure AI to enable growth insights", why: "AI gateway key required" },
+  ],
+};
+
 export const generateDailyPlan = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => PayloadSchema.parse(d))
+  .validator((d: unknown) => PayloadSchema.parse(d))
   .handler(async ({ data }) => {
     const key = process.env.LOVABLE_API_KEY;
-    if (!key) throw new Error("Missing AI gateway key");
+    
+    // Return mock data if no API key is configured
+    if (!key || key === 'your-lovable-api-key-here') {
+      console.warn("[Daily Planner] LOVABLE_API_KEY not configured, returning mock data");
+      return MOCK_DAILY_PLAN;
+    }
 
     const gateway = createLovableAiGatewayProvider(key);
 
@@ -52,11 +74,16 @@ Generate a focused daily action plan. Respond ONLY with valid JSON:
     const jsonEnd = cleaned.lastIndexOf("}");
     const parsed = JSON.parse(cleaned.slice(jsonStart, jsonEnd + 1));
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("ai_reports").insert({
-      report_type: "planner",
-      content: parsed,
-    });
+    // Persist report - only if Supabase is configured
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.from("ai_reports").insert({
+        report_type: "planner",
+        content: parsed,
+      });
+    } catch (e) {
+      console.warn("[Daily Planner] Could not persist report to Supabase:", e);
+    }
 
     return parsed;
   });
